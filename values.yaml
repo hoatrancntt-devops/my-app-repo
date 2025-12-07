@@ -1,0 +1,21 @@
+image:
+  repository: harbor.hoatranlab.io.vn/library/my-app
+  pullPolicy: Always
+  tag: "latest" # CI sẽ tự động thay số này bằng mã commit
+
+# Tên secret tạo ở bước 8.1
+imagePullSecrets:
+  - name: regcred
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  hosts:
+    - host: nlb.hoatranlab.io.vn
+      paths:
+        - path: /
+          pathType: Prefix

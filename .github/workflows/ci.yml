@@ -1,0 +1,34 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    # Đăng nhập vào Harbor của bạn
+    - name: Login to Harbor
+      uses: docker/login-action@v1
+      with:
+        registry: harbor.hoatranlab.io.vn
+        username: ${{ secrets.HARBOR_USERNAME }}
+        password: ${{ secrets.HARBOR_PASSWORD }}
+        
+    # Build ảnh và đẩy lên Harbor
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t harbor.hoatranlab.io.vn/library/my-app:${{ github.sha }} .
+        docker push harbor.hoatranlab.io.vn/library/my-app:${{ github.sha }}
+        
+    # Cập nhật file values.yaml để ArgoCD nhận biết ảnh mới
+    - name: Update Helm Values
+      run: |
+        sed -i 's/tag: .*/tag: "${{ github.sha }}"/' values.yaml
+        git config --global user.email "ci@hoatranlab.io.vn"
+        git config --global user.name "CI Bot"
+        git commit -am "Update image tag to ${{ github.sha }}"
+        git push
