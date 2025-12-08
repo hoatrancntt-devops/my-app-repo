@@ -15,8 +15,8 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: harbor.devopsviet.io.vn
-        username: ${{ secrets.HARBOR_ROBOT_USER }}
-        password: ${{ secrets.HARBOR_ROBOT_TOKEN }}
+        username: ${{ secrets.HARBOR_USERNAME }}  # <-- Kiểm tra kỹ tên này
+        password: ${{ secrets.HARBOR_PASSWORD }}  # <-- Kiểm tra kỹ tên này
         
     # 2. Build & Push Image
     - name: Build and Push
