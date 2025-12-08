@@ -10,21 +10,21 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    # Đăng nhập vào Harbor của bạn
+    # 1. Login Harbor
     - name: Login to Harbor
       uses: docker/login-action@v1
       with:
-        registry: harbor.hoatranlab.io.vn
-        username: ${{ secrets.HARBOR_USERNAME }}
-        password: ${{ secrets.HARBOR_PASSWORD }}
+        registry: harbor.devopsviet.io.vn
+        username: ${{ secrets.HARBOR_ROBOT_USER }}
+        password: ${{ secrets.HARBOR_ROBOT_TOKEN }}
         
-    # Build ảnh và đẩy lên Harbor
-    - name: Build and Push Docker Image
+    # 2. Build & Push Image
+    - name: Build and Push
       run: |
-        docker build -t harbor.hoatranlab.io.vn/library/my-app:${{ github.sha }} .
-        docker push harbor.hoatranlab.io.vn/library/my-app:${{ github.sha }}
+        docker build -t harbor.devopsviet.io.vn/hoatranlab/hoa-hello:${{ github.sha }} .
+        docker push harbor.devopsviet.io.vn/hoatranlab/hoa-hello:${{ github.sha }}
         
-    # Cập nhật file values.yaml để ArgoCD nhận biết ảnh mới
+    # 3. Update Helm Values (GitOps)
     - name: Update Helm Values
       run: |
         sed -i 's/tag: .*/tag: "${{ github.sha }}"/' values.yaml

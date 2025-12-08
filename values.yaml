@@ -1,11 +1,11 @@
 image:
-  repository: harbor.hoatranlab.io.vn/library/my-app
+  repository: harbor.devopsviet.io.vn/hoatranlab/hoa-hello
   pullPolicy: Always
-  tag: "latest" # CI sẽ tự động thay số này bằng mã commit
+  tag: "latest" # CI sẽ update dòng này
 
-# Tên secret tạo ở bước 8.1
+# Secret tạo ở bước 0.2
 imagePullSecrets:
-  - name: regcred
+  - name: harbor-creds
 
 service:
   type: ClusterIP
