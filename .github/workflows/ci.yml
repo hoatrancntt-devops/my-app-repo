@@ -4,19 +4,24 @@ on:
   push:
     branches: [ main ]
 
+# CẤP QUYỀN GHI ĐỂ CHẠY ĐƯỢC LỆNH GIT PUSH
+permissions:
+  contents: write
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    # Nâng cấp lên v4 để chạy nhanh hơn
+    - uses: actions/checkout@v4
     
-    # 1. Login Harbor
+    # 1. Login Harbor (Nâng cấp lên v3 để hết cảnh báo lỗi)
     - name: Login to Harbor
-      uses: docker/login-action@v1
+      uses: docker/login-action@v3
       with:
         registry: harbor.devopsviet.io.vn
-        username: ${{ secrets.HARBOR_USERNAME }}  # <-- Kiểm tra kỹ tên này
-        password: ${{ secrets.HARBOR_PASSWORD }}  # <-- Kiểm tra kỹ tên này
+        username: ${{ secrets.HARBOR_USERNAME }} 
+        password: ${{ secrets.HARBOR_PASSWORD }} 
         
     # 2. Build & Push Image
     - name: Build and Push
@@ -27,8 +32,14 @@ jobs:
     # 3. Update Helm Values (GitOps)
     - name: Update Helm Values
       run: |
-        sed -i 's/tag: .*/tag: "${{ github.sha }}"/' values.yaml
+        # Cấu hình Git user
         git config --global user.email "ci@hoatranlab.io.vn"
         git config --global user.name "CI Bot"
-        git commit -am "Update image tag to ${{ github.sha }}"
+        
+        # Sửa file values.yaml
+        sed -i 's/tag: .*/tag: "${{ github.sha }}"/' values.yaml
+        
+        # Commit và Push lại vào repo
+        git add values.yaml
+        git commit -m "Update image tag to ${{ github.sha }}"
         git push
