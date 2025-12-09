@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
 
-# CẤP QUYỀN GHI ĐỂ CHẠY ĐƯỢC LỆNH GIT PUSH
+# QUAN TRỌNG: Cấp quyền để chạy được lệnh git push ở cuối
 permissions:
   contents: write
 
@@ -12,34 +12,35 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-    # Nâng cấp lên v4 để chạy nhanh hơn
+    # 1. Checkout code (Dùng bản v4 mới nhất)
     - uses: actions/checkout@v4
     
-    # 1. Login Harbor (Nâng cấp lên v3 để hết cảnh báo lỗi)
+    # 2. Login vào Harbor
+    # Lưu ý: GitHub sẽ tự động lấy user/pass từ 2 Secrets bạn vừa tạo ở Bước 1
     - name: Login to Harbor
       uses: docker/login-action@v3
       with:
         registry: harbor.devopsviet.io.vn
-        username: ${{ secrets.HARBOR_USERNAME }} 
-        password: ${{ secrets.HARBOR_PASSWORD }} 
+        username: ${{ secrets.HARBOR_USERNAME }}
+        password: ${{ secrets.HARBOR_PASSWORD }}
         
-    # 2. Build & Push Image
+    # 3. Build & Push Image
     - name: Build and Push
       run: |
         docker build -t harbor.devopsviet.io.vn/hoatranlab/hoa-hello:${{ github.sha }} .
         docker push harbor.devopsviet.io.vn/hoatranlab/hoa-hello:${{ github.sha }}
         
-    # 3. Update Helm Values (GitOps)
+    # 4. Update Helm Values (GitOps)
     - name: Update Helm Values
       run: |
-        # Cấu hình Git user
+        # Cấu hình Git user ảo để commit
         git config --global user.email "ci@hoatranlab.io.vn"
         git config --global user.name "CI Bot"
         
-        # Sửa file values.yaml
+        # Thay thế tag cũ bằng tag mới trong file values.yaml
         sed -i 's/tag: .*/tag: "${{ github.sha }}"/' values.yaml
         
-        # Commit và Push lại vào repo
+        # Commit và Push thay đổi lên lại GitHub
         git add values.yaml
         git commit -m "Update image tag to ${{ github.sha }}"
         git push
