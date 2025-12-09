@@ -1,9 +1,9 @@
 image:
   repository: harbor.devopsviet.io.vn/hoatranlab/hoa-hello
-  pullPolicy: Always
-  tag: "latest" # CI sẽ update dòng này
+  pullPolicy: IfNotPresent
+  tag: "latest" # Pipeline sẽ sửa dòng này
 
-# Secret tạo ở bước 0.2
+# Secret tạo ở bước 0.3
 imagePullSecrets:
   - name: harbor-creds
 
