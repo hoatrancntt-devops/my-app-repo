@@ -1,7 +1,7 @@
 image:
   repository: harbor.devopsviet.io.vn/hoatranlab/hoa-hello
   pullPolicy: IfNotPresent
-  tag: "latest" # Pipeline sẽ sửa dòng này
+  tag: "8b6b48d68423f13414022ab35aa5bd10f9f35d2c"
 
 # Secret tạo ở bước 0.3
 imagePullSecrets:
